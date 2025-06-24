@@ -151,14 +151,31 @@ def post_id_view(request, id):
 
 @csrf_exempt
 def regular_user_view(request):
+    fields = ["id", "username", "email"]
     if request.method == "GET":
         try:
-            pass
+            data = list(RegularUser.objects.values(*fields))
+            return JsonResponse(data= data, safe=False, status=200)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status = 500)
     elif request.method == "POST":
         try:
-            pass
+            data = json.loads(request.body)
+            username = (data.get("username"))
+            email = (data.get("email"))
+            password = (data.get("password"))
+            if not username or not isinstance(username, str):
+                raise ValueError("Invalid username")
+            if not email or not isinstance(email, str):
+                raise ValueError("Invalid email")
+            if not password or not isinstance(password, str):
+                raise ValueError("Invalid password format")
+            new_user = RegularUser.objects.create(
+                username = username,
+                email = email,
+                password = make_password(password),
+            )
+            return JsonResponse(data= RegularUser.objects.filter(id=new_user.id).values(*fields)[0], safe=False, status=201)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status = 500)
     return HttpResponseNotAllowed(["GET", "POST"])
@@ -166,19 +183,44 @@ def regular_user_view(request):
 
 @csrf_exempt
 def regular_user_id_view(request, id):
+    fields = ["id", "username", "email"]
     if request.method == "PUT":
         try:
-            pass
+            data = json.loads(request.body)
+            if not id:
+                raise ValueError("Invalid user id")
+            username = (data.get("username"))
+            email = (data.get("email"))
+            password = (data.get("password"))
+            if not username or not isinstance(username, str):
+                raise ValueError("Invalid username")
+            if not email or not isinstance(email, str):
+                raise ValueError("Invalid email")
+            if not password or not isinstance(password, str):
+                raise ValueError("Invalid password format")
+            target_user = RegularUser.objects.get(id=id)
+            target_user.username = username
+            target_user.email = email
+            target_user.password = make_password(password)
+            target_user.save()
+            return JsonResponse(data= RegularUser.objects.filter(id=id).values(*fields)[0], safe=False, status=200)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status = 500)
     elif request.method == "DELETE":
         try:
-            pass
+            if not id:
+                raise ValueError("Invalid user id")
+            target_user = RegularUser.objects.get(id = id)
+            target_user.delete()
+            return JsonResponse(data= {"success": True}, safe=False, status=200)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status = 500)
     elif request.method == "GET":
         try:
-            pass
+            if not id:
+                raise ValueError("Invalid user id")
+            target_user = RegularUser.objects.get(id = id)
+            return JsonResponse(data= RegularUser.objects.filter(id=id).values(*fields)[0], safe=False, status=200)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status = 500)
     return HttpResponseNotAllowed(["PUT", "DELETE", "GET"])
