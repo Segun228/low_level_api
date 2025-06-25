@@ -1,8 +1,7 @@
 import json
-from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from models import Post, RegularUser
+from .models import Post, RegularUser
 from django.contrib.auth.hashers import make_password
 
 @csrf_exempt
