@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "api",
+    "cbv_api",
+    "fbv_api",
     "django_extensions",
     "django.contrib.admin",
     "django.contrib.auth",
